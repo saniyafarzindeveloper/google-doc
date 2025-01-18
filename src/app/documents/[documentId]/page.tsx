@@ -1,15 +1,10 @@
-'use client'
+import React from 'react'
+import Editor from './editor'
 
-import { useEditor, EditorContent } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
-
-const Tiptap = () => {
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: '<p>Hello World! 🌎️</p>',
-  })
-
-  return <EditorContent editor={editor} />
+export default function DocumentIdPage() {
+  return (
+    <div className='min-h-screen bg-[#FAFBFD]'>
+      <Editor />
+    </div>
+  )
 }
-
-export default Tiptap
