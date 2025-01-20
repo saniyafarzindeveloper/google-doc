@@ -9,9 +9,39 @@ import TableCell from '@tiptap/extension-table-cell'
 import TableHeader from '@tiptap/extension-table-header'
 import TableRow from '@tiptap/extension-table-row'
 import Image from '@tiptap/extension-image'
+import TextStyle from '@tiptap/extension-text-style'
+import FontFamily from '@tiptap/extension-font-family'
+import Underline from '@tiptap/extension-underline'
+import { useEditorStore } from "@/store/use-editor-store";
 
 export default function Editor() {
+  const {setEditor} = useEditorStore(); 
   const editor = useEditor({
+    immediatelyRender: false,
+    onCreate({editor}) {
+      setEditor(editor);
+    },
+    onDestroy() {
+      setEditor(null); //when editor unmounts, clear all changes
+    },
+    onUpdate({editor}) {
+      setEditor(editor);
+    },
+    onSelectionUpdate({editor}) {
+      setEditor(editor);
+    },
+    onTransaction({editor}) {
+      setEditor(editor);
+    },
+    onFocus({editor}) {
+      setEditor(editor);
+    },
+    onBlur({editor}) {
+      setEditor(editor);
+    },
+    onContentError({editor}) {
+      setEditor(editor);
+    },
     editorProps: {
       attributes: {
         style: "padding-left:56px; padding-right:56px",
@@ -32,9 +62,11 @@ export default function Editor() {
       TableRow,
       TableHeader,
       TableCell,
-   
+      Underline,
+      FontFamily,
+      TextStyle,
     ],
-    content: '',
+    content: 'Hello World!',
   });
   return (
     <div className="size-full overflow-x-auto bg-[#FBFDF9] px-4 print:p-0 print:bg-white print:overflow-visible">
