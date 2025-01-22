@@ -6,6 +6,7 @@ import {
   BoldIcon,
   ChevronDownIcon,
   HighlighterIcon,
+  ImageIcon,
   ItalicIcon,
   Link2Icon,
   ListTodoIcon,
@@ -14,60 +15,147 @@ import {
   PrinterIcon,
   Redo2Icon,
   RemoveFormattingIcon,
+  SearchIcon,
   SpellCheckIcon,
   UnderlineIcon,
   Undo2Icon,
+  UploadIcon,
 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { Dialog, DialogContent, DialogFooter, DialogTitle, DialogHeader } from "@/components/ui/dialog";
 import { type Level } from "@tiptap/extension-heading";
-import { SketchPicker, type  ColorResult } from "react-color";
+import { SketchPicker, type ColorResult } from "react-color";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-const LinkButton = () => {
+const ImageButton = () => {
   const { editor } = useEditorStore();
-  const [value, setValue] = useState(editor?.getAttributes("link"). href || "");
-  const onChange = (href: string) => {
-    editor?.chain().focus().extendMarkRange("link").setLink({href}).run();
-    setValue("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const onChange = (src: string) => {
+    editor?.chain().focus().setImage({src}).run();
   };
+
+  //img uploading section implementation
+  const onUpload = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e) =>{
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if(file){
+        const imageUrl = URL.createObjectURL(file);
+        onChange(imageUrl);
+      }
+    }
+
+    input.click();
+  };
+
+  //if URL is passed
+  const handleImageURLSubmit = () =>{ 
+    if(imageUrl){
+      onChange(imageUrl);
+      setImageUrl("");
+      setIsDialogOpen(false);
+    }
+  }
   return (
+    <>
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="h-7 min-w-7 shrink-0 flex flex-col items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm">
-        <Link2Icon className="size-4" />
-      
+          <ImageIcon className="size-4" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+       <DropdownMenuItem onClick={onUpload}>
+        <UploadIcon className="size-4 mr-2" />
+        Upload
+       </DropdownMenuItem>
+
+       <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
+        <SearchIcon className="size-4 mr-2" /> 
+         Paste image URL
+       </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>
+          Insert Image URL
+        </DialogTitle>
+      </DialogHeader>
+      <Input placeholder="Insert Image URL" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)}  onKeyDown={(e) => {
+        if(e.key === "Enter"){
+          handleImageURLSubmit(); //set url on pressing enter button
+        }
+      }}/>
+       <DialogFooter>
+      <Button onClick={handleImageURLSubmit}>
+       Insert
+      </Button>
+    </DialogFooter>
+    </DialogContent>
+
+   
+    </Dialog>
+    </>
+    
+  );
+};
+
+const LinkButton = () => {
+  const { editor } = useEditorStore();
+  const [value, setValue] = useState("");
+  const onChange = (href: string) => {
+    editor?.chain().focus().extendMarkRange("link").setLink({ href }).run();
+    setValue("");
+  };
+  return (
+    <DropdownMenu
+      onOpenChange={(open) => {
+        if (open) {
+          setValue(editor?.getAttributes("link").href);
+        }
+      }}
+    >
+      <DropdownMenuTrigger asChild>
+        <button className="h-7 min-w-7 shrink-0 flex flex-col items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm">
+          <Link2Icon className="size-4" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-2.5 flex items-center gap-x-2">
-       <Input placeholder="https://samplelink.com" value={value} onChange={(e) => setValue(e.target.value)}/>
-       <Button  onClick={() => onChange(value)}>
-        Apply
-       </Button>
+        <Input
+          placeholder="https://samplelink.com"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+        <Button onClick={() => onChange(value)}>Apply</Button>
       </DropdownMenuContent>
     </DropdownMenu>
   );
-
-}
+};
 
 const HighlightColorButton = () => {
   const { editor } = useEditorStore();
   const value = editor?.getAttributes("highlight").color || "#ffffff";
   const onChange = (color: ColorResult) => {
-    editor?.chain().setHighlight({ color : color.hex}).run();
+    editor?.chain().setHighlight({ color: color.hex }).run();
   };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="h-7 min-w-7 shrink-0 flex flex-col items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm">
-        <HighlighterIcon className="size-4" />
-      
+          <HighlighterIcon className="size-4" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-0">
@@ -87,11 +175,8 @@ const TextColorButton = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="h-7 min-w-7 shrink-0 flex flex-col items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm">
-        <span className="text-sm">
-          A
-        </span>
-        <div className="h-0.5 w-full" style={{backgroundColor: value}} />
-      
+          <span className="text-sm">A</span>
+          <div className="h-0.5 w-full" style={{ backgroundColor: value }} />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-0">
@@ -320,7 +405,11 @@ export default function Toolbar() {
       <Separator orientation="vertical" className="h-6 bg-neutral-300" />
       <HighlightColorButton />
       <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+      {/* LINK BUTTON */}
       <LinkButton />
+      <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+      {/* IMAGE UPLOAD / PASTE BUTTON */}
+      <ImageButton />
       <Separator orientation="vertical" className="h-6 bg-neutral-300" />
       {/* BOLD ITALIC UNDERLINE */}
       {sections[1].map((item) => (
@@ -334,4 +423,3 @@ export default function Toolbar() {
     </div>
   );
 }
-
