@@ -15,6 +15,7 @@ import Underline from '@tiptap/extension-underline'
 import { Color } from '@tiptap/extension-color'
 import Highlight from '@tiptap/extension-highlight'
 import Link from '@tiptap/extension-link'
+import TextAlign from '@tiptap/extension-text-align'
 import { useEditorStore } from "@/store/use-editor-store";
 
 export default function Editor() {
@@ -74,6 +75,9 @@ export default function Editor() {
         openOnClick: false,
         autolink: true,
         defaultProtocol: "https"
+      }),
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
       }),
     ],
     content: 'Hello World!',
