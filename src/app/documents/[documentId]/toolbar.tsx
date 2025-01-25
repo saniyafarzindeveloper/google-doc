@@ -46,6 +46,17 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+const FontSizeButton = () => {
+  const { editor } = useEditorStore();
+  //get current font size
+  const getCurrentFontSize = editor?.getAttributes("textStyle").fontSize
+  ? editor?.getAttributes("textStyle").fontSize.replace("px", "")
+  : "16"
+
+  
+  return <div>Font size</div>;
+};
+
 const AlignButton = () => {
   const { editor } = useEditorStore();
   const alignments = [
@@ -99,18 +110,18 @@ const AlignButton = () => {
 const ListButton = () => {
   const { editor } = useEditorStore();
   const lists = [
-   {
-    label: "Bullet List",
-    icon: ListIcon,
-    isActive: () => editor?.isActive("bulletList"),
-    onclick: () => editor?.chain().focus().toggleBulletList().run(),
-   },
-   {
-    label: "Ordered List",
-    icon: ListOrdered,
-    isActive: () => editor?.isActive("orderedList"),
-    onclick: () => editor?.chain().focus().toggleOrderedList().run(),
-   }
+    {
+      label: "Bullet List",
+      icon: ListIcon,
+      isActive: () => editor?.isActive("bulletList"),
+      onclick: () => editor?.chain().focus().toggleBulletList().run(),
+    },
+    {
+      label: "Ordered List",
+      icon: ListOrdered,
+      isActive: () => editor?.isActive("orderedList"),
+      onclick: () => editor?.chain().focus().toggleOrderedList().run(),
+    },
   ];
   return (
     <DropdownMenu>
@@ -120,7 +131,7 @@ const ListButton = () => {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-1 flex flex-col gap-y-1">
-      {lists.map(({ label, icon: Icon, isActive, onclick }) => (
+        {lists.map(({ label, icon: Icon, isActive, onclick }) => (
           <button
             key={label}
             onClick={onclick}
@@ -522,6 +533,9 @@ export default function Toolbar() {
       <Separator orientation="vertical" className="h-6 bg-neutral-300" />
 
       <ListButton />
+      <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+
+      <FontSizeButton />
       <Separator orientation="vertical" className="h-6 bg-neutral-300" />
       {/* COMMENTS / TODO LIST / REMOVE STYLES */}
       {sections[2].map((item) => (

@@ -18,6 +18,10 @@ import Link from '@tiptap/extension-link'
 import TextAlign from '@tiptap/extension-text-align'
 import { useEditorStore } from "@/store/use-editor-store";
 
+//custom extension
+import { FontSizeExtension } from "@/extensions/font-sizes";
+
+
 export default function Editor() {
   const {setEditor} = useEditorStore(); 
   const editor = useEditor({
@@ -55,6 +59,7 @@ export default function Editor() {
     },
     extensions: [
       StarterKit,
+      FontSizeExtension,
       Image,
       TaskList,
       TaskItem.configure({
