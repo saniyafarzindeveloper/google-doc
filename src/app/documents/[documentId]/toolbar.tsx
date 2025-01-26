@@ -13,11 +13,14 @@ import {
   ImageIcon,
   ItalicIcon,
   Link2Icon,
+  ListCollapseIcon,
   ListIcon,
   ListOrdered,
   ListTodoIcon,
   LucideIcon,
   MessageSquarePlus,
+  MinusIcon,
+  PlusIcon,
   PrinterIcon,
   Redo2Icon,
   RemoveFormattingIcon,
@@ -46,15 +49,133 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+const LineHeightButton = () => {
+  const { editor } = useEditorStore();
+  const lineHeights = [
+    {
+      label:'Default',
+      value: 'normal',
+    },
+    {
+      label:'Single',
+      value: '1',
+    },
+    {
+      label:'1.15',
+      value: '1.15',
+    },
+    {
+      label:'1.5',
+      value: '1.5',
+    },
+    {
+      label:'Double',
+      value: '2',
+    }
+  ];
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="h-7 min-w-7 shrink-0 flex flex-col items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm">
+          <ListCollapseIcon className="size-4" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-1 flex flex-col gap-y-1">
+        {lineHeights.map(({ label, value }) => (
+          <button
+            key={value}
+            onClick={() => editor?.chain().focus().setLineHeight(value).run()}
+            className={cn(
+              "flex items-center gap-x-2 px-2 py-1 rounded-sm hover:bg-neutral-200/80",
+              editor?.getAttributes("paragraph").lineHeight === value && "bg-neutral-200/80"
+            )}
+          >
+          
+            <span className="text-sm">{label}</span>
+          </button>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
 const FontSizeButton = () => {
   const { editor } = useEditorStore();
   //get current font size
   const getCurrentFontSize = editor?.getAttributes("textStyle").fontSize
-  ? editor?.getAttributes("textStyle").fontSize.replace("px", "")
-  : "16"
+    ? editor?.getAttributes("textStyle").fontSize.replace("px", "")
+    : "16";
+  const [fontSize, setFontSize] = useState(getCurrentFontSize);
+  const [inputValue, setInputValue] = useState(fontSize);
+  const [isEditing, setIsEditing] = useState(false);
 
-  
-  return <div>Font size</div>;
+  //this funct gets current size & updates it
+  const updateFontSize = (newSize: string) => {
+    const size = parseInt(newSize);
+    if (!isNaN(size) && size > 0) {
+      editor?.chain().setFontSize(`${size}px`).run();
+      setFontSize(newSize);
+      setInputValue(newSize);
+      setIsEditing(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleInputBlur = () => {
+    updateFontSize(inputValue);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      updateFontSize(inputValue);
+      editor?.commands.focus();
+    }
+  };
+
+  //increment when clicked on +
+  const increment = () => {
+    const newSize = parseInt(fontSize) + 1;
+    updateFontSize(newSize.toString());
+  };
+
+  //decrement when clicked on -
+  const decrement = () => {
+    const newSize = parseInt(fontSize) - 1;
+    if (newSize > 0) {
+      updateFontSize(newSize.toString());
+    }
+  };
+
+  return <div className="flex items-center gap-x-0.5">
+    <button onClick={decrement} className="h-7 w-7  flex items-center justify-center rounded-sm hover:bg-neutral-200/80 text-sm">
+      <MinusIcon className="size-4" />
+    </button>
+   {isEditing ? (
+    <input type="number"
+    value={inputValue}
+    onChange={handleInputChange}
+    onBlur={handleInputBlur}
+    onKeyDown={handleKeyDown}
+    className="h-7 w-10 border border-neutral-400 text-center rounded-sm bg-transparent focus:outline-none focus:ring-0 text-sm"
+    />
+   ): (
+    <button 
+    onClick={() => {
+      setIsEditing(true);
+      setFontSize(getCurrentFontSize);
+    }}
+    className="hover:bg-neutral-200/80 h-7 w-10 border border-neutral-400 text-center rounded-sm bg-transparent cursor-text text-sm">
+      {getCurrentFontSize}
+    </button>
+   )}
+   <button onClick={increment} className="h-7 w-7  flex items-center justify-center rounded-sm hover:bg-neutral-200/80 text-sm">
+      <PlusIcon className="size-4" />
+    </button>
+    </div>;
 };
 
 const AlignButton = () => {
@@ -536,6 +657,9 @@ export default function Toolbar() {
       <Separator orientation="vertical" className="h-6 bg-neutral-300" />
 
       <FontSizeButton />
+      <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+
+      <LineHeightButton />
       <Separator orientation="vertical" className="h-6 bg-neutral-300" />
       {/* COMMENTS / TODO LIST / REMOVE STYLES */}
       {sections[2].map((item) => (

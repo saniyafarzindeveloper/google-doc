@@ -21,6 +21,8 @@ import { useEditorStore } from "@/store/use-editor-store";
 //custom extension
 import { FontSizeExtension } from "@/extensions/font-sizes";
 
+//custom line height extension
+import { LineHeightExtension } from "@/extensions/line-height";
 
 export default function Editor() {
   const {setEditor} = useEditorStore(); 
@@ -60,6 +62,10 @@ export default function Editor() {
     extensions: [
       StarterKit,
       FontSizeExtension,
+      LineHeightExtension.configure({
+        types: ["heading", "paragraph"],
+        defaultLineHeight :"normal",
+      }),
       Image,
       TaskList,
       TaskItem.configure({
