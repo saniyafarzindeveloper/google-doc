@@ -1,0 +1,18 @@
+import {  LoaderIcon } from "lucide-react";
+import React from "react";
+
+interface FullScreenLoaderProps {
+  label?: string;
+
+}
+
+export default function FullScreenLoader({
+  label,
+}: FullScreenLoaderProps) {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-2 ">
+      <LoaderIcon className="size-20 text-muted-foreground animate-spin" />
+      {label && <p className="text-sm text-muted-foreground">{label}</p>}
+    </div>
+  );
+}
