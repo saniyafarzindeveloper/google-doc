@@ -1,9 +1,10 @@
 import { TableCell, TableRow } from "@/components/ui/table"
 import { Doc } from "../../../convex/_generated/dataModel"
 import {SiGoogledocs} from "react-icons/si"; 
-import {  Building2Icon, CircleUserIcon, MoreVertical } from "lucide-react";
+import {  Building2Icon, CircleUserIcon } from "lucide-react";
 import {format} from "date-fns";
-import { Button } from "@/components/ui/button";
+
+import DropDownMenu from "./dropdown-menu";
 
 interface DocumentRowProps{
     document: Doc<"documents">;
@@ -26,9 +27,12 @@ export default function DocumentRow({document} : DocumentRowProps) {
                 {format(new Date(document._creationTime), "MMM dd, yyyy")}
         </TableCell>
         <TableCell className="flex justify-end">
-            <Button variant="ghost" size="icon" className="rounded-full">
-               <MoreVertical className="size-4"/>
-            </Button>
+            
+            <DropDownMenu
+            documentId = {document._id}
+            title = {document.title}
+            // onNewTab = {onNewTabClick}
+            />
         </TableCell>
     </TableRow>
   )
