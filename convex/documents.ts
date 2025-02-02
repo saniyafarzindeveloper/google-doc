@@ -27,3 +27,26 @@ export const get = query({
     return await ctx.db.query("documents").paginate(args.paginationOpts);
   },
 });
+
+export const removeById = mutation({
+  args:{id: v.id("documents")},
+  handler: async (ctx, args) => {
+    const user = await ctx.auth.getUserIdentity(); //check whether user is authenticated or not
+    if(!user){
+      throw new ConvexError("Unauthorized to remove doc!")
+    }
+    const document = await ctx.db.get(args.id); //get the doc from DB
+    if(!document){
+      throw new ConvexError("Document not found!");
+    }
+
+    //check if we are the owner
+    const isOwner = document.ownerId === user.subject;
+    if(!isOwner){
+      throw new ConvexError("You are not the doc owner!")
+    }
+
+    //del if no catch 
+    return await ctx.db.delete(args.id);
+  }
+})
