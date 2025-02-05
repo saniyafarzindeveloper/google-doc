@@ -20,7 +20,7 @@ interface DocumentMenuProps {
 
 export default function DocumentMenu({
   documentId,
-  title,
+  // title,
   onNewTab,
 }: DocumentMenuProps) {
   return (

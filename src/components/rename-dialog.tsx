@@ -18,7 +18,7 @@ interface RenameDialogProps {
 }
 
 export default function RenameDialog({
-  documentId,
+  // documentId,
   children,
 }: RenameDialogProps) {
 

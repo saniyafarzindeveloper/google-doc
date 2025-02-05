@@ -20,8 +20,8 @@ interface DocumentsTableProps {
 
 export default function DocumentsTable({
   documents,
-  loadMore,
-  status,
+//   loadMore,
+//   status,
 }: DocumentsTableProps) {
   return (<div className="mx-auto max-w-screen-xl px-16 py-6 flex flex-col gap-5">
  {documents === undefined ? (
