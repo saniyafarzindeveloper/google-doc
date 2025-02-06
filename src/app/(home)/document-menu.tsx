@@ -20,7 +20,7 @@ interface DocumentMenuProps {
 
 export default function DocumentMenu({
   documentId,
-  // title,
+  title,
   onNewTab,
 }: DocumentMenuProps) {
   return (
@@ -31,7 +31,7 @@ export default function DocumentMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-      <RenameDialog documentId={documentId}>
+      <RenameDialog documentId={documentId} initialTitle= {title}>
           <DropdownMenuItem
             onSelect={(e) => e.preventDefault()}
             onClick={(e) => e.stopPropagation()}
@@ -40,6 +40,10 @@ export default function DocumentMenu({
             Rename
           </DropdownMenuItem>
         </RenameDialog>
+
+        {/* ////// */}
+
+
         <RemoveDialog documentId={documentId}>
           <DropdownMenuItem
             onSelect={(e) => e.preventDefault()}

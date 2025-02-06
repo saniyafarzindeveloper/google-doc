@@ -1,57 +1,88 @@
 "use client";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-  } from "@/components/ui/dialog"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Id } from "../../convex/_generated/dataModel";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { useMutation } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import { useState } from "react";
 
 interface RenameDialogProps {
   documentId: Id<"documents">;
   children: React.ReactNode;
+  initialTitle: string;
 }
 
 export default function RenameDialog({
-  // documentId,
+  documentId,
+  initialTitle,
   children,
 }: RenameDialogProps) {
+  const update = useMutation(api.documents.updateById);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [title, setTitle] = useState(initialTitle);
+  const [open, setOpen] = useState(false);
 
-   
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsUpdating(true);
+    update({
+      id: documentId,
+      title: title.trim() || "Untitled Document",
+    }).finally(() => {
+      setIsUpdating(false);
+      setOpen(false);
+    });
+  };
   return (
-  <Dialog>
-    <DialogTrigger asChild>
-        {children}
-    </DialogTrigger>
-    <DialogContent>
-        <form>
-            <DialogHeader>
-                <DialogTitle>
-                    Rename Document
-                </DialogTitle>
-                <DialogDescription>
-                   Enter a new name
-                </DialogDescription>
-                
-            </DialogHeader>
-            <div className="my-4">
-                <Input />
-            </div>
-            <DialogFooter>
-            <Button>
-                    Cancel
-                </Button>
-                <Button>
-                    Save changes 
-                </Button>
-            </DialogFooter>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent>
+        <form onSubmit={onSubmit}>
+          <DialogHeader>
+            <DialogTitle>Rename Document</DialogTitle>
+            <DialogDescription>Enter a new name</DialogDescription>
+          </DialogHeader>
+          <div className="my-4">
+            <Input
+              value={title}
+              placeholder="Document Name"
+              onChange={(e) => setTitle(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={isUpdating}
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isUpdating}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              Save changes
+            </Button>
+          </DialogFooter>
         </form>
-    </DialogContent>
-  </Dialog>
+      </DialogContent>
+    </Dialog>
   );
 }
