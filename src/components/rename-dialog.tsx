@@ -37,7 +37,9 @@ export default function RenameDialog({
     update({
       id: documentId,
       title: title.trim() || "Untitled Document",
-    }).finally(() => {
+    })
+    .then(() => setOpen(false))
+    .finally(() => {
       setIsUpdating(false);
       setOpen(false);
     });
@@ -45,7 +47,7 @@ export default function RenameDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
+      <DialogContent onClick={(e) => {e.stopPropagation()}}>
         <form onSubmit={onSubmit}>
           <DialogHeader>
             <DialogTitle>Rename Document</DialogTitle>
@@ -66,7 +68,7 @@ export default function RenameDialog({
               disabled={isUpdating}
               onClick={(e) => {
                 e.stopPropagation();
-                setOpen(false);
+
               }}
             >
               Cancel

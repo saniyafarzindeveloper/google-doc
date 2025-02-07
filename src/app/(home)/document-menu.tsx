@@ -1,5 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { Edit2Icon, ExternalLinkIcon, MoreVertical, Trash2Icon } from "lucide-react";
+import {
+  Edit2Icon,
+  ExternalLinkIcon,
+  MoreVertical,
+  Trash2Icon,
+} from "lucide-react";
 import React from "react";
 import { Id } from "../../../convex/_generated/dataModel";
 
@@ -31,7 +36,7 @@ export default function DocumentMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-      <RenameDialog documentId={documentId} initialTitle= {title}>
+        <RenameDialog documentId={documentId} initialTitle={title}>
           <DropdownMenuItem
             onSelect={(e) => e.preventDefault()}
             onClick={(e) => e.stopPropagation()}
@@ -43,7 +48,6 @@ export default function DocumentMenu({
 
         {/* ////// */}
 
-
         <RemoveDialog documentId={documentId}>
           <DropdownMenuItem
             onSelect={(e) => e.preventDefault()}
@@ -53,7 +57,12 @@ export default function DocumentMenu({
             Remove
           </DropdownMenuItem>
         </RemoveDialog>
-        <DropdownMenuItem onClick={() => onNewTab(documentId)}>
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.stopPropagation(); // Prevents TableRow's onClick from firing
+            onNewTab(documentId);
+          }}
+        >
           <ExternalLinkIcon className="size-4 mr-2" />
           Open in a new tab
         </DropdownMenuItem>
