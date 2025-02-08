@@ -4,12 +4,9 @@ import Link from "next/link";
 import DocumentInput from "./document-input";
 import {
   Menubar,
-  MenubarCheckboxItem,
   MenubarContent,
   MenubarItem,
   MenubarMenu,
-  MenubarRadioGroup,
-  MenubarRadioItem,
   MenubarSeparator,
   MenubarShortcut,
   MenubarSub,
@@ -38,6 +35,7 @@ import {
 } from "lucide-react";
 import { BsFilePdf } from "react-icons/bs";
 import { useEditorStore } from "@/store/use-editor-store";
+import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 
 export default function Navbar() {
   const { editor } = useEditorStore();
@@ -58,9 +56,9 @@ export default function Navbar() {
     a.href = url;
     a.download = filename;
     a.click();
-  }
+  };
 
-  //download as JSON 
+  //download as JSON
   const downloadAsJSON = () => {
     if (!editor) return;
 
@@ -69,10 +67,10 @@ export default function Navbar() {
       type: "application/json",
     });
     onDownload(blob, `document.json`);
-  }
+  };
 
-   //download as HTML
-   const downloadAsHTML = () => {
+  //download as HTML
+  const downloadAsHTML = () => {
     if (!editor) return;
 
     const content = editor.getHTML();
@@ -80,10 +78,10 @@ export default function Navbar() {
       type: "text/html",
     });
     onDownload(blob, `document.html`);
-  }
+  };
 
-   //download as JSON 
-   const downloadAsText = () => {
+  //download as JSON
+  const downloadAsText = () => {
     if (!editor) return;
 
     const content = editor.getText();
@@ -91,7 +89,7 @@ export default function Navbar() {
       type: "text/plain",
     });
     onDownload(blob, `document.txt`);
-  }
+  };
   return (
     <nav className="flex items-center justify-between ">
       <div className="flex gap-2 items-center">
@@ -181,10 +179,26 @@ export default function Navbar() {
                       <Table className="size-4 mr-2" /> Table
                     </MenubarSubTrigger>
                     <MenubarSubContent>
-                      <MenubarItem onClick={() => insertTable({rows:1 , cols: 1})}>1 x 1</MenubarItem>
-                      <MenubarItem onClick={() => insertTable({rows:2 , cols: 2})}>2 x 2</MenubarItem>
-                      <MenubarItem onClick={() => insertTable({rows:3 , cols: 3})}>3 x 3</MenubarItem>
-                      <MenubarItem onClick={() => insertTable({rows:4 , cols: 4})}>4 x 4</MenubarItem>
+                      <MenubarItem
+                        onClick={() => insertTable({ rows: 1, cols: 1 })}
+                      >
+                        1 x 1
+                      </MenubarItem>
+                      <MenubarItem
+                        onClick={() => insertTable({ rows: 2, cols: 2 })}
+                      >
+                        2 x 2
+                      </MenubarItem>
+                      <MenubarItem
+                        onClick={() => insertTable({ rows: 3, cols: 3 })}
+                      >
+                        3 x 3
+                      </MenubarItem>
+                      <MenubarItem
+                        onClick={() => insertTable({ rows: 4, cols: 4 })}
+                      >
+                        4 x 4
+                      </MenubarItem>
                     </MenubarSubContent>
                   </MenubarSub>
                 </MenubarContent>
@@ -200,26 +214,46 @@ export default function Navbar() {
                       <TextIcon className="size-4 mr-2" /> Text
                     </MenubarSubTrigger>
                     <MenubarSubContent>
-                      <MenubarItem onClick={() => editor?.chain().focus().toggleBold().run()}>
+                      <MenubarItem
+                        onClick={() =>
+                          editor?.chain().focus().toggleBold().run()
+                        }
+                      >
                         <BoldIcon className="size-4 mr-2" /> Bold{" "}
                         <MenubarShortcut>&#x2318;B</MenubarShortcut>
                       </MenubarItem>
-                      <MenubarItem onClick={() => editor?.chain().focus().toggleItalic().run()}>
+                      <MenubarItem
+                        onClick={() =>
+                          editor?.chain().focus().toggleItalic().run()
+                        }
+                      >
                         <ItalicIcon className="size-4 mr-2" /> Italic{" "}
                         <MenubarShortcut>&#x2318;I</MenubarShortcut>
                       </MenubarItem>
-                      <MenubarItem onClick={() => editor?.chain().focus().toggleUnderline().run()}>
+                      <MenubarItem
+                        onClick={() =>
+                          editor?.chain().focus().toggleUnderline().run()
+                        }
+                      >
                         <UnderlineIcon className="size-4 mr-2" /> Underline{" "}
                         <MenubarShortcut>&#x2318;U</MenubarShortcut>
                       </MenubarItem>
-                      <MenubarItem onClick={() => editor?.chain().focus().toggleStrike().run()}>
+                      <MenubarItem
+                        onClick={() =>
+                          editor?.chain().focus().toggleStrike().run()
+                        }
+                      >
                         <StrikethroughIcon className="size-4 mr-2" />{" "}
                         Strikethrough &nbsp;
                         <MenubarShortcut>&#x2318;S</MenubarShortcut>
                       </MenubarItem>
                     </MenubarSubContent>
                   </MenubarSub>
-                  <MenubarItem onClick={() => editor?.chain().focus().unsetAllMarks().run()}>
+                  <MenubarItem
+                    onClick={() =>
+                      editor?.chain().focus().unsetAllMarks().run()
+                    }
+                  >
                     <RemoveFormatting className="size-4 mr-2" /> Remove
                     Formatting
                   </MenubarItem>
@@ -228,6 +262,15 @@ export default function Navbar() {
             </Menubar>
           </div>
         </div>
+      </div>
+      <div className="flex gap-3 items-center pl-6">
+      <OrganizationSwitcher 
+      afterCreateOrganizationUrl='/'
+      afterLeaveOrganizationUrl="/"
+      afterSelectOrganizationUrl='/'
+      afterSelectPersonalUrl='/'
+      />
+       <UserButton />
       </div>
     </nav>
   );

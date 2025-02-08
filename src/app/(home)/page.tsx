@@ -5,11 +5,15 @@ import Navbar from "./navbar";
 import TemplateGallery from "./template-gallery";
 import { api } from "../../../convex/_generated/api";
 import DocumentsTable from "./documents-table";
+import { useSearchParam } from "@/hooks/use-search-params";
+
+
 export default function Home() {
+  const [search] = useSearchParam();
   //fetching docs from convex
   const { results, status, loadMore } = usePaginatedQuery(
     api.documents.get,
-    {},
+    { search },
     { initialNumItems: 5 }
   ); //setting inital doc displaying count to 5
 
@@ -27,7 +31,11 @@ export default function Home() {
         {/* {documents?.map((document) => (
           <span key={document._id}>{document.title}</span>
         ))} */}
-        <DocumentsTable documents = {results} loadMore = {loadMore} status = {status} />
+        <DocumentsTable
+          documents={results}
+          loadMore={loadMore}
+          status={status}
+        />
       </div>
     </div>
   );

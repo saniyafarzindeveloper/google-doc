@@ -4,72 +4,140 @@ import { paginationOptsValidator } from "convex/server";
 
 //authorizing with clerk & convex inside backend
 export const create = mutation({
-  args:{title: v.optional(v.string()),  initialContent: v.optional(v.string()) },
+  args: {
+    title: v.optional(v.string()),
+    initialContent: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
     //ctx stands for context, args stnds for arguments
     const user = await ctx.auth.getUserIdentity(); //check whether user is authenticated or not
-    if(!user){
-      throw new ConvexError("Unauthorized!")
+    if (!user) {
+      throw new ConvexError("Unauthorized!");
     }
+
+    const organizationId = (user.organization_id ?? undefined) as
+      | string
+      | undefined;
 
     return await ctx.db.insert("documents", {
       title: args.title ?? "Untitled Document",
       ownerId: user.subject,
+      organizationId,
       initialContent: args.initialContent,
-    })
+    });
   },
-
-})
+});
 
 export const get = query({
-  args:{ paginationOpts : paginationOptsValidator},
-  handler: async(ctx , args) => {
-    return await ctx.db.query("documents").paginate(args.paginationOpts);
+  args: {
+    paginationOpts: paginationOptsValidator,
+    search: v.optional(v.string()),
+  },
+  //run different queries depending upon whether i have / dont have search
+
+  handler: async (ctx, { search, paginationOpts }) => {
+    //protect the route
+    const user = await ctx.auth.getUserIdentity();
+    console.log({ user });
+    if (!user) {
+      throw new ConvexError("Unauthorized");
+    }
+
+    const organizationId = (user.organization_id ?? undefined) as
+      | string
+      | undefined;
+
+    //search within organization
+    if (search && organizationId) {
+      return await ctx.db
+        .query("documents")
+        .withSearchIndex("search_title", (q) =>
+          q.search("title", search).eq("organizationId", organizationId)
+        )
+        .paginate(paginationOpts);
+    }
+
+    //personal account search
+    if (search) {
+      return await ctx.db
+        .query("documents")
+        .withSearchIndex("search_title", (q) =>
+          q.search("title", search).eq("ownerId", user.subject)
+        )
+        .paginate(paginationOpts); //paginate
+    }
+
+    //search inside all docs of organization
+    if (organizationId) {
+      return await ctx.db
+        .query("documents")
+        .withIndex("by_organization_id", (q) =>
+          q.eq("organizationId", organizationId)
+        )
+        .paginate(paginationOpts);
+    }
+    //non-search query - all personal docs
+    return await ctx.db
+      .query("documents")
+      .withIndex("by_owner_id", (q) => q.eq("ownerId", user.subject))
+      .paginate(paginationOpts);
   },
 });
 
 export const removeById = mutation({
-  args:{id: v.id("documents")},
+  args: { id: v.id("documents") },
   handler: async (ctx, args) => {
     const user = await ctx.auth.getUserIdentity(); //check whether user is authenticated or not
-    if(!user){
-      throw new ConvexError("Unauthorized to remove doc!")
+    if (!user) {
+      throw new ConvexError("Unauthorized to remove doc!");
     }
+
     const document = await ctx.db.get(args.id); //get the doc from DB
-    if(!document){
+    if (!document) {
       throw new ConvexError("Document not found!");
     }
 
+    //removing authority to the organization member
+    const organizationId = (user.organization_id ?? undefined) as
+      | string
+      | undefined;
+    const isOrganizationMember = document.organizationId === organizationId;
+
     //check if we are the owner
     const isOwner = document.ownerId === user.subject;
-    if(!isOwner){
-      throw new ConvexError("You are not the doc owner!")
+    if (!isOwner && !isOrganizationMember) {
+      throw new ConvexError("You are not the doc owner!");
     }
 
-    //del if no catch 
+    //del if no catch
     return await ctx.db.delete(args.id);
-  }
-})
+  },
+});
 
 export const updateById = mutation({
-  args:{id: v.id("documents"), title: v.string()},
+  args: { id: v.id("documents"), title: v.string() },
   handler: async (ctx, args) => {
     const user = await ctx.auth.getUserIdentity(); //check whether user is authenticated or not
-    if(!user){
-      throw new ConvexError("Unauthorized to update doc!")
+    if (!user) {
+      throw new ConvexError("Unauthorized to update doc!");
     }
     const document = await ctx.db.get(args.id); //get the doc from DB
-    if(!document){
+    if (!document) {
       throw new ConvexError("Document not found!");
     }
 
+    const organizationId = (user.organization_id ?? undefined) as
+      | string
+      | undefined;
+    const isOrganizationMember = document.organizationId === organizationId;
+
     //check if we are the owner
     const isOwner = document.ownerId === user.subject;
-    if(!isOwner){
-      throw new ConvexError("You are not the doc owner!")
+    if (!isOwner && !isOrganizationMember) {
+      throw new ConvexError("You are not the doc owner!");
     }
 
-    //update if no catch 
-    return await ctx.db.patch(args.id, {title: args.title});
-  }
-})
+    //update if no catch
+    return await ctx.db.patch(args.id, { title: args.title });
+  },
+});
