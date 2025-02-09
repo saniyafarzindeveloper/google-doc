@@ -32,3 +32,4 @@ export function ConvexClientProvider({ children }: { children: ReactNode }) {
     </ClerkProvider>
   );
 }
+
