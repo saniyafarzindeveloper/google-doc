@@ -2,6 +2,7 @@ import React from "react";
 import Editor from "./editor";
 import Toolbar from "./toolbar";
 import Navbar from "./navbar";
+import { Room } from './room';
 
 export default function DocumentIdPage() {
   return (
@@ -10,8 +11,12 @@ export default function DocumentIdPage() {
         <Navbar />
         <Toolbar />
       </div>
-    <div className="pt-[115px] print:pt-0"> <Editor /></div>
-     
+      <div className="pt-[115px] print:pt-0">
+        <Room>
+          {" "}
+          <Editor />
+        </Room>
+      </div>
     </div>
   );
 }
