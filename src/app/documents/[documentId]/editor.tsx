@@ -27,7 +27,7 @@ import { FontSizeExtension } from "@/extensions/font-sizes";
 import { LineHeightExtension } from "@/extensions/line-height";
 import Ruler from "./ruler";
 import { Threads } from "./threads";
-import { root } from "postcss";
+
 
 export default function Editor() {
   //liveblocks section
