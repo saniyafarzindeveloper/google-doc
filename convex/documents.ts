@@ -101,7 +101,7 @@ export const removeById = mutation({
     const organizationId = (user.organization_id ?? undefined) as
       | string
       | undefined;
-    const isOrganizationMember = document.organizationId === organizationId;
+      const isOrganizationMember = !!(document.organizationId && document.organizationId === organizationId);
 
     //check if we are the owner
     const isOwner = document.ownerId === user.subject;
@@ -129,7 +129,7 @@ export const updateById = mutation({
     const organizationId = (user.organization_id ?? undefined) as
       | string
       | undefined;
-    const isOrganizationMember = document.organizationId === organizationId;
+    const isOrganizationMember = !!(document.organizationId && document.organizationId === organizationId);
 
     //check if we are the owner
     const isOwner = document.ownerId === user.subject;
@@ -141,3 +141,11 @@ export const updateById = mutation({
     return await ctx.db.patch(args.id, { title: args.title });
   },
 });
+
+export const getById = query({
+  args: {id: v.id("documents")},
+  handler:  async (ctx,  {id}) => {
+    return await ctx.db.get(id);
+   
+  },
+})
