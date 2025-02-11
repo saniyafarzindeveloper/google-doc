@@ -35,7 +35,7 @@ const AvatarStack = () => {
             })}
           </div>
         </div>
-        <Separator />
+        <Separator  />
       </>
     );
   };
